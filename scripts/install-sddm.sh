@@ -6,6 +6,7 @@
 set -e
 # Everything runs from the repository root.
 cd "$(dirname "$0")/.."
+. scripts/lib/system.sh
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "Run this with sudo." >&2
@@ -31,6 +32,8 @@ GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
 [Wayland]
 CompositorCommand=kwin_wayland --drm --no-lockscreen --no-global-shortcuts --locale1
 EOF
+
+sync_login_monitors
 
 echo "Theme installed. To switch from Plasma Login Manager to SDDM (takes effect at the next boot):"
 echo "  sudo systemctl disable plasmalogin.service"

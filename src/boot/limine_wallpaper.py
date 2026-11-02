@@ -32,7 +32,10 @@ FONTS = SRC / "theme" / "fonts"
 # Layout, as fractions of the screen so any resolution works.
 MARGIN_X = 0.19          # the menu's inset from the left and right edges
 MARGIN_Y = 0.25          # ...and from the top and bottom
-FONT_SCALE = 3           # Limine's 8x16 font, scaled for HiDPI
+CELL_W, CELL_H = 9, 16   # Limine's font, before scaling
+# Below 16 text rows Limine drops the whole graphical theme, wallpaper included,
+# and shows a plain menu. Keep a couple spare.
+MIN_ROWS = 18
 
 
 def rgb(hex_colour, alpha=255):
@@ -51,9 +54,15 @@ def font(name, size, variation=None):
     return f
 
 
+def font_scale(height):
+    """Limine's font scale, keeping text the same share of the screen height."""
+    return max(1, round(height / 800))
+
+
 def layout(width, height):
     """Limine applies one margin on all sides; returns it and the menu box."""
     margin = round(min(width * MARGIN_X, height * MARGIN_Y))
+    margin = max(0, min(margin, (height - MIN_ROWS * CELL_H * font_scale(height)) // 2))
     return margin, (margin, margin, width - margin, height - margin)
 
 
@@ -167,7 +176,7 @@ def draw_menu(image, v, brand, entries):
     width, height = image.size
     margin, (x0, y0, x1, y1) = layout(width, height)
     d = ImageDraw.Draw(image)
-    cell_w, cell_h = 9 * FONT_SCALE, 16 * FONT_SCALE
+    cell_w, cell_h = CELL_W * font_scale(height), CELL_H * font_scale(height)
     f = font("mono-bold", round(cell_h * 0.72))
     cols = (x1 - x0) // cell_w
     branding = f"{brand.upper()} // BOOT SELECT"
@@ -190,6 +199,7 @@ def draw_menu(image, v, brand, entries):
 def theme_conf(v, brand, width, height, wallpaper_hash):
     """Global limine.conf options: wallpaper, menu text and palette."""
     margin, _ = layout(width, height)
+    scale = font_scale(height)
     hexes = lambda colours: ";".join(c.lstrip("#") for c in colours)
     ansi = v["ansi"]
     return "\n".join([
@@ -200,7 +210,7 @@ def theme_conf(v, brand, width, height, wallpaper_hash):
         f"interface_branding: {brand.upper()} // BOOT SELECT",
         "interface_branding_colour: " + v["accent"].lstrip("#"),
         "interface_help_hidden: yes",
-        f"term_font_scale: {FONT_SCALE}x{FONT_SCALE}",
+        f"term_font_scale: {scale}x{scale}",
         "term_palette: " + hexes(ansi[:8]),
         "term_palette_bright: " + hexes(ansi[8:]),
         "term_background: ff000000",

@@ -55,6 +55,11 @@ sudo ./orbiter boot          # optional: boot menu and animation
 
 Run `./orbiter help` for the full list.
 
+`sudo ./orbiter login` also gives the login screen your Plasma monitor layout,
+and shows the prompt on your primary display. Run it again if you change your
+monitors. If that display isn't plugged in, the prompt goes on the first one Qt
+lists.
+
 ## Using it
 
 - **Variant:** use the Design swatches in the bar's quick settings, or run

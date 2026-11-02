@@ -26,6 +26,30 @@ regenerate_grub_cfg() {
     fi
 }
 
+# Gives the login screen the monitor layout and primary display of the user
+# running sudo. SDDM's KWin keeps its own layout, which starts in connector
+# order. The primary display goes in the theme's config too: SDDM's own idea of
+# it is whichever output Qt lists first, whatever KWin's layout says.
+sync_login_monitors() {
+    user_config="$(getent passwd "$SUDO_USER" | cut -d: -f6)/.config/kwinoutputconfig.json"
+    sddm_home="$(getent passwd sddm | cut -d: -f6)"
+    if [ -z "$SUDO_USER" ] || [ -z "$sddm_home" ] || [ ! -f "$user_config" ]; then
+        echo "Note: no Plasma monitor layout found to copy, so the login screen keeps its own."
+        return 0
+    fi
+    login_config="$sddm_home/.config/kwinoutputconfig.json"
+    if [ -f "$login_config" ] && [ ! -f "$login_config.orbiter-backup" ]; then
+        cp -p "$login_config" "$login_config.orbiter-backup"
+    fi
+    install -d -o sddm -g sddm "$sddm_home/.config"
+    install -m 644 -o sddm -g sddm "$user_config" "$login_config"
+    primary_output="$(python3 src/boot/kwin_primary_output.py "$user_config" || true)"
+    if [ -n "$primary_output" ]; then
+        echo "primaryOutput=$primary_output" >> /usr/share/sddm/themes/orbiter/theme.conf
+    fi
+    echo "Login screen monitors now follow $SUDO_USER's Plasma layout (primary: ${primary_output:-unknown}); run this again if you change them."
+}
+
 # Finds limine.conf in the places Limine looks, on CachyOS's configured ESP
 # or the usual mount points. Sets LIMINE_CONF, and LIMINE_ESP to the mount
 # point of its partition (what limine.conf calls boot():/).

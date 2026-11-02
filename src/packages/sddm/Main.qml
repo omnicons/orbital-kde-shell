@@ -12,7 +12,18 @@ Item {
     property date now: new Date()
     property string notification
     property int sessionIndex: Math.max(0, sessionModel.lastIndex)
-    readonly property bool isPrimary: typeof primaryScreen === "undefined" || primaryScreen
+    // SDDM's primaryScreen is just the output Qt lists first, so the installer
+    // records the real one in theme.conf. Falls back if it isn't plugged in.
+    readonly property string chosenOutput: typeof config === "undefined" ? "" : (config.primaryOutput || "")
+    readonly property bool chosenConnected: {
+        for (const screen of Qt.application.screens) {
+            if (screen.name === chosenOutput)
+                return true
+        }
+        return false
+    }
+    readonly property bool isPrimary: chosenConnected ? Screen.name === chosenOutput
+                                                      : typeof primaryScreen === "undefined" || primaryScreen
 
     function login() {
         sddm.login(user.text, password.text, sessionIndex)
@@ -53,6 +64,14 @@ Item {
         running: true
         repeat: true
         onTriggered: root.now = new Date()
+    }
+
+    // SDDM activates the window on its own primary screen; typing has to reach
+    // the one showing the prompt. Delayed so this comes after SDDM's request.
+    Timer {
+        interval: 300
+        running: root.isPrimary && root.chosenConnected
+        onTriggered: root.Window.window.requestActivate()
     }
 
     Timer {
