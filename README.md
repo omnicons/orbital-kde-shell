@@ -125,7 +125,11 @@ ukify or dracut is set up to sign them itself. So with Secure Boot on,
 either setup is present without sbctl. If you sign some other way, run it with
 `ORBITER_SECURE_BOOT_OVERRIDE=1` and re-sign before rebooting. When it
 finishes on a Secure Boot machine with sbctl, it runs `sbctl verify` and
-warns you not to reboot if anything is unsigned.
+warns you not to reboot if anything is unsigned. An unsigned fallback loader
+(`EFI/BOOT/BOOTX64.EFI`) that the machine doesn't boot from only gets a note. If
+the install or uninstall fails or is interrupted after editing an enrolled
+`limine.conf`, it re-enrolls the config before exiting, and tells you not to
+reboot if that fails too.
 
 If GRUB is set to enforce GPG signatures (`check_signatures=enforce`), the
 GRUB menu theme is skipped, since GRUB would reject it, and only the

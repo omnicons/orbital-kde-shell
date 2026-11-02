@@ -92,6 +92,7 @@ echo "$BOOTLOADER" > "$STATE/bootloader"
 case "$BOOTLOADER" in
 limine)
     CONF="$LIMINE_CONF"
+    limine_guard_enrollment
     [ -f "$CONF.orbiter-backup" ] || cp -p "$CONF" "$CONF.orbiter-backup"
     mkdir -p "$LIMINE_ESP/orbiter"
     cp build/boot/limine/wallpaper.png "$LIMINE_ESP/orbiter/limine-wallpaper.png"

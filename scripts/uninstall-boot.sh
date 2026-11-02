@@ -29,6 +29,7 @@ fi
 case "$BOOTLOADER" in
 limine)
     if find_limine; then
+        limine_guard_enrollment
         python3 src/boot/limine_conf.py remove "$LIMINE_CONF"
         rm -rf "$LIMINE_ESP/orbiter"
     fi

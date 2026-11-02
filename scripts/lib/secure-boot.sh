@@ -88,6 +88,10 @@ secure_boot_preflight() {
         SKIP_MENU=1
     fi
 
+    [ $enrolled = yes ] && ! command -v limine-enroll-config >/dev/null 2>&1 && problems="${problems}
+  - limine.conf's checksum is enrolled into the Limine binary, but
+    limine-enroll-config isn't here to update it after editing the config."
+
     if [ $sb = on ] && [ $signer = none ]; then
         [ $uki = yes ] && ! uki_signs_itself && problems="${problems}
   - The initramfs is inside signed kernel images (UKIs), and nothing here
@@ -110,8 +114,26 @@ secure_boot_preflight() {
     return 0
 }
 
-# After a rebuild with Secure Boot on: ask sbctl whether everything on the
-# ESP it tracks is still signed, and say so loudly if not.
+# Whether this boot came through the firmware's fallback path,
+# \EFI\BOOT\BOOT*.EFI. Yes if that can't be told, so a real problem isn't
+# written off as an unused file.
+booted_from_fallback() {
+    command -v efibootmgr >/dev/null 2>&1 || return 0
+    boot_current="$(efibootmgr 2>/dev/null | sed -n 's/^BootCurrent: *//p')"
+    [ -n "$boot_current" ] || return 0
+    boot_entry="$(efibootmgr -v 2>/dev/null | grep -i "^Boot$boot_current" | tr '\\' / | tr '[:upper:]' '[:lower:]')"
+    case "$boot_entry" in
+        */efi/boot/boot*.efi*) return 0 ;;
+        *.efi*) return 1 ;;
+        *) return 0 ;;
+    esac
+}
+
+# After a rebuild with Secure Boot on: ask sbctl whether every EFI image on the
+# ESP is still signed, and say so loudly if not. An unsigned fallback that this
+# machine doesn't boot from only gets a note: nothing here changed it, and
+# signing it isn't always wise (Limine with no enrolled config treats Secure
+# Boot as inactive).
 secure_boot_verify() {
     secure_boot_on || return 0
     if ! sbctl_ready; then
@@ -123,13 +145,47 @@ secure_boot_verify() {
         return 0
     fi
     unsigned="$(sbctl verify 2>/dev/null | grep -i 'not signed' || true)"
+    if ! booted_from_fallback; then
+        fallback='/EFI/BOOT/BOOT[^/]*\.EFI'
+        unused="$(echo "$unsigned" | grep -iE "$fallback" || true)"
+        unsigned="$(echo "$unsigned" | grep -ivE "$fallback" || true)"
+        if [ -n "$unused" ]; then
+            echo "Note: the firmware's fallback loader isn't signed, but this machine doesn't boot from it:"
+            echo "$unused"
+        fi
+    fi
     if [ -n "$unsigned" ]; then
-        echo "Warning: Secure Boot is on and these files are no longer signed:" >&2
+        echo "Warning: Secure Boot is on and these files are not signed:" >&2
         echo "$unsigned" >&2
-        echo "Do not reboot yet: run 'sudo sbctl sign-all' (or sign them yourself), then 'sudo sbctl verify'." >&2
+        echo "Do not reboot yet: sign each with 'sudo sbctl sign -s <file>', then run 'sudo sbctl verify'." >&2
         return 1
     fi
-    echo "sbctl verify: everything it tracks is signed."
+    echo "sbctl verify: everything this machine boots from is signed."
+}
+
+# Call before editing an enrolled limine.conf. Limine panics at boot if the
+# config doesn't match the enrolled checksum, so from here on any failure or
+# interruption re-enrolls whatever the config has become before exiting.
+limine_guard_enrollment() {
+    limine_config_enrolled || return 0
+    trap 'limine_repair_enrollment $?' EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' HUP TERM
+}
+
+# $1: the status the script is exiting with.
+limine_repair_enrollment() {
+    trap - EXIT
+    [ "$1" = 0 ] && return 0
+    echo "Stopped partway; re-enrolling limine.conf so the machine can still boot." >&2
+    if command -v limine-enroll-config >/dev/null 2>&1 && limine-enroll-config; then
+        echo "limine.conf is re-enrolled and signed. If the initramfs rebuild didn't finish," >&2
+        echo "run 'sudo limine-update' before rebooting, or its hashes may be out of date." >&2
+    else
+        echo "DO NOT REBOOT: limine.conf no longer matches the enrolled checksum, and Limine" >&2
+        echo "will panic at boot. Run 'sudo limine-enroll-config' and make sure it succeeds." >&2
+    fi
+    exit "$1"
 }
 
 # Limine with an enrolled config: re-enroll and re-sign after editing it.
