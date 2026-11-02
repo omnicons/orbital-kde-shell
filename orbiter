@@ -7,7 +7,8 @@ usage() {
     cat <<'EOF'
 Usage: ./orbiter <command> [arguments]
 
-  install                 build and install the wallpaper, lock screen and bar
+  install                 build and install the wallpaper, lock screen, bar and
+                          Plasma splash
   theme [variant]         apply the theme: black (default), dark or pearl;
                           --revert goes back to Breeze Dark
   lockscreen              use the Orbiter lock screen (log out and back in)

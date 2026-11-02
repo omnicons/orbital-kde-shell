@@ -3,8 +3,8 @@
 A KDE Plasma 6 desktop theme built around an ASCII-art Earth. The planet,
 the Moon and the real night sky are drawn as characters on the wallpaper,
 lock screen and login screen. A top bar of square pills holds a system
-dashboard, quick settings and a launcher, and the boot menu and boot
-animation match. It comes in three variants, Black, Dark and Pearl, which
+dashboard, quick settings and a launcher, and the boot menu, boot animation
+and Plasma splash match. It comes in three variants, Black, Dark and Pearl, which
 switch live.
 
 Made for CachyOS (or Arch) and Fedora 44 or later, with Plasma 6 on
@@ -67,8 +67,8 @@ everything. To change your answers, run `chezmoi init --prompt` and then
 From a clone, everything goes through `./orbiter`:
 
 ```sh
-./orbiter install            # wallpaper, lock screen and bar
-./orbiter theme black        # colours, Plasma style, fonts, Konsole, fish, fastfetch
+./orbiter install            # wallpaper, lock screen, bar and splash
+./orbiter theme black        # colours, Plasma style, fonts, Konsole, fish, fastfetch, splash
 ./orbiter lockscreen         # use the lock screen, then log out and back in
 ./orbiter taskbar remove     # optional: remove other panels (default: keep them)
 sudo ./orbiter login         # optional: SDDM login screen
@@ -95,6 +95,22 @@ lists.
   Earth as its logo, so CachyOS's fish greeting matches too. Any config you
   already had is kept as `~/.config/fastfetch/config.jsonc.orbiter-backup`,
   and `./orbiter theme --revert` puts it back.
+
+## Plasma splash
+
+`./orbiter theme` also selects Orbiter's splash, which shows between the login
+screen and the desktop. The Earth, clock and date carry over from the login
+screen, then fade to the wallpaper's Earth. It looks the same in every variant,
+like the wallpaper. Your previous splash is remembered: `./orbiter theme --revert`
+or `./orbiter uninstall` puts it back, unless you've picked another since. To
+choose a different one, use System Settings > Colors & Themes > Splash Screen.
+
+To preview it in a window after `./orbiter install`, run
+`ksplashqml --test --window "$PWD/build/splash"`.
+
+"Orbiter Splash" also shows up in System Settings' Global Theme list, as
+splash-only packages do. It isn't a full theme, so don't pick it there; anything
+it doesn't include falls back to Breeze.
 
 ## Customising
 
@@ -202,8 +218,8 @@ the previous GRUB setup.
 
 ```sh
 sudo ./orbiter uninstall-boot   # if the boot theme is installed
-./orbiter uninstall             # wallpaper, lock screen and bar
-./orbiter theme --revert        # back to Breeze Dark, default fonts and your fastfetch config
+./orbiter uninstall             # wallpaper, lock screen, bar and splash
+./orbiter theme --revert        # back to Breeze Dark, default fonts, your fastfetch config and splash
 ```
 
 ## Layout
@@ -212,8 +228,8 @@ sudo ./orbiter uninstall-boot   # if the boot theme is installed
 |---|---|
 | `orbiter` | The command everything runs through |
 | `tokens.toml` | Design tokens: colours, fonts, sizes, brand |
-| `src/scene/` | The ASCII scene: QML, shaders and textures, shared by the wallpaper, lock and login screens |
-| `src/packages/` | The Plasma wallpaper, lock screen and bar, and the SDDM theme |
+| `src/scene/` | The ASCII scene: QML, shaders and textures, shared by the wallpaper, lock, login and splash screens |
+| `src/packages/` | The Plasma wallpaper, lock screen, bar and splash, and the SDDM theme |
 | `src/theme/` | The generator for the colour schemes, Plasma style and Konsole; fonts; fish colours; the fastfetch config |
 | `src/boot/` | Generators for the Limine, GRUB and Plymouth themes, and the config editors |
 | `scripts/` | The install and uninstall steps `./orbiter` runs |

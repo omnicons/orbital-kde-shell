@@ -26,6 +26,8 @@ assemble lockscreen contents/lockscreen
 cp src/scene/LockScreenUi.qml build/lockscreen/contents/lockscreen/
 # SDDM themes live in /usr/share; install-sddm.sh copies this one there as root.
 assemble sddm .
+assemble splash contents/splash
+cp build/theme/Tokens.qml build/splash/contents/splash/
 # Boot theme images and config, sized for this screen; install-boot.sh
 # installs them as root.
 size="$(tr , x < /sys/class/graphics/fb0/virtual_size 2>/dev/null || echo 3840x2400)"
@@ -45,6 +47,7 @@ install_package() {
 install_package Plasma/Wallpaper wallpaper
 install_package Plasma/Shell lockscreen
 install_package Plasma/Applet bar
+install_package Plasma/LookAndFeel splash
 
 # Puts the bar in its own top panel the first time; later runs leave the
 # panel, and wherever you've moved it, alone. Meta+Space opens the launcher

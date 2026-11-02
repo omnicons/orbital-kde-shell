@@ -1,0 +1,9 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Description": "Orbiter's startup splash: the login screen's clock and Earth, fading to the wallpaper's.",
+        "Id": "org.orbiter.splash",
+        "License": "MIT",
+        "Name": "Orbiter Splash"
+    }
+}

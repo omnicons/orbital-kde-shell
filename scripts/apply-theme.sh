@@ -1,12 +1,13 @@
 #!/bin/sh
 # Generates the Orbiter theme from tokens.toml, installs it for the
 # current user and applies it live: KDE colours, the Plasma style, fonts,
-# Konsole, fish and fastfetch.
+# Konsole, fish, fastfetch and the Plasma splash.
 #   ./orbiter theme [black|dark|pearl]   install and switch (default: black)
 #   ./orbiter theme --revert             back to Breeze Dark and default fonts
 set -e
 # Everything runs from the repository root.
 cd "$(dirname "$0")/.."
+. scripts/lib/splash.sh
 
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
 FASTFETCH="${XDG_CONFIG_HOME:-$HOME/.config}/fastfetch"
@@ -27,7 +28,8 @@ if [ "$1" = "--revert" ]; then
         rm "$FASTFETCH/config.jsonc"
     fi
     rm -f "$FASTFETCH/orbiter-logo.txt"
-    echo "Reverted to Breeze Dark, Konsole's, fish's and fastfetch's defaults. Apps pick up the default fonts when restarted."
+    restore_splash
+    echo "Reverted to Breeze Dark, Konsole's, fish's and fastfetch's defaults, and your previous splash. Apps pick up the default fonts when restarted."
     exit 0
 fi
 
@@ -75,6 +77,12 @@ if [ "$current" = "$scheme" ]; then
 fi
 "$DATA/orbiter/switch-variant.sh" "$variant"
 plasma-apply-desktoptheme orbiter
+# Needs ./orbiter install; naming a splash that isn't there would break startup.
+if plasma-apply-lookandfeel --list 2>/dev/null | grep -qx org.orbiter.splash; then
+    use_orbiter_splash
+else
+    echo "Note: the Plasma splash isn't installed, so it wasn't selected; run ./orbiter install, then this again." >&2
+fi
 
 # Qt 6 font strings: family, point size, pixel size, style hint, weight, then flags.
 font() { echo "$1,$2,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"; }
