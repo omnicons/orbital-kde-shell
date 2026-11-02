@@ -46,7 +46,7 @@ From a clone, everything goes through `./orbiter`:
 
 ```sh
 ./orbiter install            # wallpaper, lock screen and bar
-./orbiter theme black        # colours, Plasma style, fonts, Konsole, fish
+./orbiter theme black        # colours, Plasma style, fonts, Konsole, fish, fastfetch
 ./orbiter lockscreen         # use the lock screen, then log out and back in
 ./orbiter taskbar remove     # optional: remove other panels (default: keep them)
 sudo ./orbiter login         # optional: SDDM login screen
@@ -64,6 +64,10 @@ Run `./orbiter help` for the full list.
 - **Quick settings:** click the status pill at the top right. From there you
   can pick a Wi-Fi network, Bluetooth device or audio output, and right-click
   a background app for its menu.
+- **fastfetch:** the theme installs a fastfetch config with the wallpaper's
+  Earth as its logo, so CachyOS's fish greeting matches too. Any config you
+  already had is kept as `~/.config/fastfetch/config.jsonc.orbiter-backup`,
+  and `./orbiter theme --revert` puts it back.
 
 ## Customising
 
@@ -165,7 +169,7 @@ the previous GRUB setup.
 ```sh
 sudo ./orbiter uninstall-boot   # if the boot theme is installed
 ./orbiter uninstall             # wallpaper, lock screen and bar
-./orbiter theme --revert        # back to Breeze Dark and default fonts
+./orbiter theme --revert        # back to Breeze Dark, default fonts and your fastfetch config
 ```
 
 ## Layout
@@ -176,9 +180,9 @@ sudo ./orbiter uninstall-boot   # if the boot theme is installed
 | `tokens.toml` | Design tokens: colours, fonts, sizes, brand |
 | `src/scene/` | The ASCII scene: QML, shaders and textures, shared by the wallpaper, lock and login screens |
 | `src/packages/` | The Plasma wallpaper, lock screen and bar, and the SDDM theme |
-| `src/theme/` | The generator for the colour schemes, Plasma style and Konsole; fonts; fish colours |
+| `src/theme/` | The generator for the colour schemes, Plasma style and Konsole; fonts; fish colours; the fastfetch config |
 | `src/boot/` | Generators for the Limine, GRUB and Plymouth themes, and the config editors |
 | `scripts/` | The install and uninstall steps `./orbiter` runs |
 | `chezmoi/` | chezmoi's source: setup questions and run scripts |
 | `dev/` | Previews in a window: `qml6 dev/scene.qml` (`qml-qt6` on Fedora), `dev/lockscreen.qml`, `dev/boot-animation.qml` |
-| `tools/` | Scripts that produced the textures |
+| `tools/` | Scripts that produced the textures and the fastfetch logo |

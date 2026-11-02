@@ -11,7 +11,7 @@ case " $ID $ID_LIKE " in
         python-pillow qt6-shadertools qt6-tools qt6-declarative
         kpackage kconfig kitemmodels plasma-workspace ksystemstats libksysguard
         milou plasma-nm plasma-pa bluez-qt power-profiles-daemon pacman-contrib
-        plymouth fontconfig ttf-ibm-plex konsole fish
+        plymouth fontconfig ttf-ibm-plex konsole fish fastfetch
 {{- if .loginScreen }}
         sddm
 {{- end }}
@@ -28,7 +28,7 @@ case " $ID $ID_LIKE " in
         kf6-kpackage plasma-workspace ksystemstats libksysguard
         plasma-milou plasma-nm plasma-pa kf6-bluez-qt
         plymouth plymouth-scripts plymouth-plugin-script
-        fontconfig ibm-plex-sans-fonts ibm-plex-mono-fonts konsole fish
+        fontconfig ibm-plex-sans-fonts ibm-plex-mono-fonts konsole fish fastfetch
 {{- if .loginScreen }}
         sddm
 {{- end }}
@@ -43,6 +43,6 @@ case " $ID $ID_LIKE " in
     echo "Orbiter's package list covers Arch/CachyOS and Fedora; on $PRETTY_NAME, install" >&2
     echo "the equivalents yourself: Pillow, Qt 6 shader tools (qsb), Plasma 6 with" >&2
     echo "plasma-nm, plasma-pa, BluezQt, milou and libksysguard, Plymouth with its script" >&2
-    echo "plugin, IBM Plex Sans and Mono, Konsole and fish." >&2
+    echo "plugin, IBM Plex Sans and Mono, Konsole, fish and fastfetch." >&2
     ;;
 esac

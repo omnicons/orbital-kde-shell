@@ -1,7 +1,7 @@
 #!/bin/sh
 # Generates the Orbiter theme from tokens.toml, installs it for the
 # current user and applies it live: KDE colours, the Plasma style, fonts,
-# Konsole and fish.
+# Konsole, fish and fastfetch.
 #   ./orbiter theme [black|dark|pearl]   install and switch (default: black)
 #   ./orbiter theme --revert             back to Breeze Dark and default fonts
 set -e
@@ -9,6 +9,7 @@ set -e
 cd "$(dirname "$0")/.."
 
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
+FASTFETCH="${XDG_CONFIG_HOME:-$HOME/.config}/fastfetch"
 
 if [ "$1" = "--revert" ]; then
     plasma-apply-colorscheme BreezeDark
@@ -20,7 +21,13 @@ if [ "$1" = "--revert" ]; then
     kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile --delete
     echo y | fish -c 'fish_config theme save "fish default"' >/dev/null
     fish -c 'set -eU pure_color_success'
-    echo "Reverted to Breeze Dark, Konsole's and fish's defaults. Apps pick up the default fonts when restarted."
+    if [ -f "$FASTFETCH/config.jsonc.orbiter-backup" ]; then
+        mv "$FASTFETCH/config.jsonc.orbiter-backup" "$FASTFETCH/config.jsonc"
+    elif grep -qs "^// Orbiter's fastfetch" "$FASTFETCH/config.jsonc"; then
+        rm "$FASTFETCH/config.jsonc"
+    fi
+    rm -f "$FASTFETCH/orbiter-logo.txt"
+    echo "Reverted to Breeze Dark, Konsole's, fish's and fastfetch's defaults. Apps pick up the default fonts when restarted."
     exit 0
 fi
 
@@ -50,6 +57,15 @@ rm -rf "$CACHE/plasma_theme_orbiter.kcache" "$CACHE/ksvg-elements"
 cp build/theme/konsole/* "$DATA/konsole/"
 cp src/theme/switch-variant.sh "$DATA/orbiter/"
 fish src/theme/orbiter.fish
+# fastfetch, which CachyOS's fish greeting runs. Someone else's config is
+# kept once as config.jsonc.orbiter-backup; --revert puts it back.
+mkdir -p "$FASTFETCH"
+if [ -f "$FASTFETCH/config.jsonc" ] && ! grep -qs "^// Orbiter's fastfetch" "$FASTFETCH/config.jsonc" \
+   && [ ! -f "$FASTFETCH/config.jsonc.orbiter-backup" ]; then
+    mv "$FASTFETCH/config.jsonc" "$FASTFETCH/config.jsonc.orbiter-backup"
+fi
+cp src/theme/fastfetch/config.jsonc "$FASTFETCH/config.jsonc"
+cp src/theme/fastfetch/logo.txt "$FASTFETCH/orbiter-logo.txt"
 
 # plasma-apply-colorscheme skips a scheme that is already active, even if its
 # file just changed, so step through another one to force a reload.
