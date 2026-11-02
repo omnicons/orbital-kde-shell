@@ -1,0 +1,23 @@
+{{- /* Renders empty (so chezmoi skips it) unless a root-level part is chosen. */ -}}
+{{- if or .loginScreen .bootTheme -}}
+#!/bin/sh
+# The parts that need root: the SDDM login screen and the boot theme. Asks
+# for sudo. Reruns when the choices or their sources change.
+#
+# brand: {{ .brand }}, login screen: {{ .loginScreen }} (make SDDM the login manager: {{ .useSddm }}), boot theme: {{ .bootTheme }}
+# sources: {{ output "sh" "-c" (printf "cd %q && find tokens.toml src -type f ! -name '*.qsb' ! -path '*/__pycache__/*' | sort | xargs sha256sum | sha256sum" .chezmoi.workingTree) | trim }}
+set -e
+cd {{ .chezmoi.workingTree | quote }}
+
+{{ if .loginScreen -}}
+sudo ./orbiter login
+{{- if .useSddm }}
+# Replaces whichever login manager owns display-manager.service.
+sudo systemctl enable --force sddm.service
+{{- end }}
+{{- end }}
+
+{{ if .bootTheme -}}
+sudo ./orbiter boot
+{{- end }}
+{{- end }}

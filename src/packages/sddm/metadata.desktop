@@ -1,0 +1,9 @@
+[SddmGreeterTheme]
+Name=Orbiter
+Description=The Earth, the Moon and the real night sky in ASCII, matching Orbiter's lock screen
+Type=sddm-theme
+Version=1.0
+License=MIT
+MainScript=Main.qml
+ConfigFile=theme.conf
+QtVersion=6

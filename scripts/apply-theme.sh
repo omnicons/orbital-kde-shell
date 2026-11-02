@@ -1,0 +1,72 @@
+#!/bin/sh
+# Generates the Orbiter theme from tokens.toml, installs it for the
+# current user and applies it live: KDE colours, the Plasma style, fonts,
+# Konsole and fish.
+#   ./orbiter theme [black|dark|pearl]   install and switch (default: black)
+#   ./orbiter theme --revert             back to Breeze Dark and default fonts
+set -e
+# Everything runs from the repository root.
+cd "$(dirname "$0")/.."
+
+DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
+
+if [ "$1" = "--revert" ]; then
+    plasma-apply-colorscheme BreezeDark
+    plasma-apply-desktoptheme default
+    for key in font fixed smallestReadableFont toolBarFont menuFont; do
+        kwriteconfig6 --file kdeglobals --group General --key "$key" --delete
+    done
+    kwriteconfig6 --file kwinrc --group WM --key activeFont --delete
+    kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile --delete
+    echo y | fish -c 'fish_config theme save "fish default"' >/dev/null
+    fish -c 'set -eU pure_color_success'
+    echo "Reverted to Breeze Dark, Konsole's and fish's defaults. Apps pick up the default fonts when restarted."
+    exit 0
+fi
+
+python3 src/theme/generate.py
+. build/theme/fonts.sh
+
+variant="${1:-black}"
+case " $VARIANTS " in
+    *" $variant "*) ;;
+    *) echo "Unknown variant '$variant'; pick one of: $VARIANTS" >&2; exit 1 ;;
+esac
+# black -> OrbiterBlack
+scheme="Orbiter$(printf %s "$variant" | cut -c1 | tr a-z A-Z)$(printf %s "$variant" | cut -c2-)"
+
+mkdir -p "$DATA/fonts/orbiter" "$DATA/color-schemes" "$DATA/plasma/desktoptheme" "$DATA/konsole" "$DATA/orbiter"
+cp src/theme/fonts/* "$DATA/fonts/orbiter/"
+fc-cache -f "$DATA/fonts/orbiter"
+cp build/theme/color-schemes/*.colors "$DATA/color-schemes/"
+rm -rf "$DATA/plasma/desktoptheme/orbiter"
+cp -r build/theme/desktoptheme/orbiter "$DATA/plasma/desktoptheme/"
+# Plasma keeps rendered SVG metadata across restarts; drop it so a changed
+# style is actually reread.
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}"
+rm -rf "$CACHE/plasma_theme_orbiter.kcache" "$CACHE/ksvg-elements"
+# Konsole's colour schemes and a profile per variant, and the switcher that
+# the bar's Design row uses (it also sets Konsole's default profile).
+cp build/theme/konsole/* "$DATA/konsole/"
+cp src/theme/switch-variant.sh "$DATA/orbiter/"
+fish src/theme/orbiter.fish
+
+# plasma-apply-colorscheme skips a scheme that is already active, even if its
+# file just changed, so step through another one to force a reload.
+current="$(kreadconfig6 --file kdeglobals --group General --key ColorScheme)"
+if [ "$current" = "$scheme" ]; then
+    plasma-apply-colorscheme BreezeDark >/dev/null
+fi
+"$DATA/orbiter/switch-variant.sh" "$variant"
+plasma-apply-desktoptheme orbiter
+
+# Qt 6 font strings: family, point size, pixel size, style hint, weight, then flags.
+font() { echo "$1,$2,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"; }
+kwriteconfig6 --file kdeglobals --group General --key font "$(font "$UI_FONT" "$FONT_SIZE")"
+kwriteconfig6 --file kdeglobals --group General --key menuFont "$(font "$UI_FONT" "$FONT_SIZE")"
+kwriteconfig6 --file kdeglobals --group General --key toolBarFont "$(font "$UI_FONT" "$FONT_SIZE")"
+kwriteconfig6 --file kdeglobals --group General --key smallestReadableFont "$(font "$UI_FONT" "$SMALL_SIZE")"
+kwriteconfig6 --file kdeglobals --group General --key fixed "$(font "$MONO_FONT" "$FONT_SIZE")"
+kwriteconfig6 --file kwinrc --group WM --key activeFont "$(font "$UI_FONT" "$FONT_SIZE")"
+
+echo "Applied Orbiter $variant. Running apps pick up the new fonts when restarted; open Konsole windows switch too."

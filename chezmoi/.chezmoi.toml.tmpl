@@ -1,0 +1,21 @@
+{{- /* Asked once per machine at `chezmoi init`; change with `chezmoi init` again
+       (add --prompt to be asked anew). The run scripts read these. */ -}}
+{{- $brand := promptStringOnce . "brand" "Name on the boot screens" "Orbiter" -}}
+{{- $variant := promptChoiceOnce . "variant" "Orbiter variant" (list "black" "dark" "pearl") "black" -}}
+{{- $keepTaskbar := promptBoolOnce . "keepTaskbar" "Keep your existing taskbar and other panels" true -}}
+{{- $lockScreen := promptBoolOnce . "lockScreen" "Use the Orbiter lock screen" true -}}
+{{- $loginScreen := promptBoolOnce . "loginScreen" "Install the Orbiter login screen (SDDM; asks for sudo)" false -}}
+{{- $useSddm := false -}}
+{{- if $loginScreen -}}
+{{-   $useSddm = promptBoolOnce . "useSddm" "Make SDDM the login manager (takes effect next boot)" false -}}
+{{- end -}}
+{{- $bootTheme := promptBoolOnce . "bootTheme" "Install the boot theme: Limine or GRUB menu and Plymouth (asks for sudo)" false -}}
+
+[data]
+    brand = {{ $brand | quote }}
+    variant = {{ $variant | quote }}
+    keepTaskbar = {{ $keepTaskbar }}
+    lockScreen = {{ $lockScreen }}
+    loginScreen = {{ $loginScreen }}
+    useSddm = {{ $useSddm }}
+    bootTheme = {{ $bootTheme }}

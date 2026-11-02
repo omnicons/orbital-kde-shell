@@ -1,0 +1,113 @@
+# Orbiter design tokens: the one place colours, fonts and sizes are set.
+# src/theme/generate.py and the boot generators turn these into KDE colour
+# schemes, the Plasma style, Konsole, and the boot screens; the widgets read
+# the colours back through the colour scheme, so switching variants is live
+# everywhere.
+#
+# Per-machine changes go in ~/.config/orbiter/tokens.toml instead: any of
+# the same tables and keys, merged over these (chezmoi writes the brand there).
+
+# The name on the boot screens and menu titles.
+[brand]
+name = "Orbiter"
+
+[fonts]
+ui = "IBM Plex Sans"
+mono = "IBM Plex Mono"
+display = "Share Tech Mono"   # headings, the date, bracketed labels
+dot = "Doto"                  # large type only: the hostname, big numbers
+dot_weight = 700              # lighter loses the dots, heavier fuses them
+size = 10                     # points
+terminal = 11                 # points, Konsole
+small = 8
+
+[sizes]
+border = 1          # px, popups, tooltips and pills
+radius = 0          # everything is square
+popup_padding = 12  # px inside popups
+terminal_margin = 12  # px around Konsole's text
+bar_height = 22     # px, the top bar pills
+bar_gap = 4         # px between the screen edge and the pills
+
+# Each variant lists the same roles:
+#   bar       pill background on the top bar
+#   window    popups and app windows
+#   view      lists, text areas and terminals
+#   card      raised blocks: buttons, cards
+#   hover     hovered rows
+#   selected  selected rows and cards
+#   text / muted / dim   three levels of foreground
+#   heading   cool accent for titles and the date
+#   accent    warm accent: active workspace, brackets, focus
+#   selection background of selected text and items, with selection_text on it
+#   positive / neutral / negative   status colours
+#   line      borders, as an opacity of `text`
+#   ansi      the terminal's 16 colours: black red green yellow blue magenta
+#             cyan white, then their bright versions. Yellow is the accent and
+#             blue the heading colour, so prompts and tools match the desktop.
+
+[variants.black]
+name = "Black"
+bar = "#000000"
+window = "#060a0e"
+view = "#000000"
+card = "#121217"
+hover = "#191d21"
+selected = "#1f2429"
+text = "#eceff3"
+muted = "#8f9397"
+dim = "#5b5b5b"
+heading = "#b5baf1"
+accent = "#eaa067"
+selection = "#94624c"
+selection_text = "#fbf3ee"
+positive = "#8fb58a"
+neutral = "#eaa067"
+negative = "#d9705f"
+line = 0.10
+ansi = ["#1f2429", "#d9705f", "#8fb58a", "#eaa067", "#9aa0e6", "#c49ad8", "#7fb8c4", "#c9ccd1",
+        "#5b5f66", "#e8907f", "#a9cba4", "#f2bd8e", "#b5baf1", "#d6b6e6", "#a1ccd5", "#eceff3"]
+
+[variants.dark]
+name = "Dark"
+bar = "#0b0e12"
+window = "#11151a"
+view = "#0d1014"
+card = "#1a1f25"
+hover = "#20262c"
+selected = "#272e35"
+text = "#e6e9ee"
+muted = "#8d9298"
+dim = "#5f646a"
+heading = "#b5baf1"
+accent = "#eaa067"
+selection = "#94624c"
+selection_text = "#fbf3ee"
+positive = "#8fb58a"
+neutral = "#eaa067"
+negative = "#d9705f"
+line = 0.10
+ansi = ["#1f2429", "#d9705f", "#8fb58a", "#eaa067", "#9aa0e6", "#c49ad8", "#7fb8c4", "#c9ccd1",
+        "#5b5f66", "#e8907f", "#a9cba4", "#f2bd8e", "#b5baf1", "#d6b6e6", "#a1ccd5", "#eceff3"]
+
+[variants.pearl]
+name = "Pearl"
+bar = "#f2f2ef"
+window = "#eaeae6"
+view = "#f4f4f1"
+card = "#e2e2de"
+hover = "#dcdcd7"
+selected = "#d3d3cd"
+text = "#2d2d2d"
+muted = "#6f7271"
+dim = "#9a9d9b"
+heading = "#4f5596"
+accent = "#b8643a"
+selection = "#c98a66"
+selection_text = "#ffffff"
+positive = "#4f7f4a"
+neutral = "#b8643a"
+negative = "#b2483a"
+line = 0.16
+ansi = ["#2d2d2d", "#b2483a", "#4f7f4a", "#b8643a", "#4f5596", "#8a5aa3", "#3f7f8c", "#c9c9c3",
+        "#6f7271", "#c9604f", "#659460", "#c97d52", "#6a70b0", "#a173b8", "#5797a3", "#e2e2de"]

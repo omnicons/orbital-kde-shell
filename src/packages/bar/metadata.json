@@ -1,0 +1,12 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Category": "Windows and Tasks",
+        "Description": "Orbiter's top bar: workspaces, system load, the clock and status, as separate pills",
+        "Icon": "preferences-desktop-theme",
+        "Id": "org.orbiter.bar",
+        "License": "MIT",
+        "Name": "Orbiter Bar"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

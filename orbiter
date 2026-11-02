@@ -1,0 +1,45 @@
+#!/bin/sh
+# Orbiter's one command. Each subcommand runs a script in scripts/.
+set -e
+here="$(cd "$(dirname "$0")" && pwd)"
+
+usage() {
+    cat <<'EOF'
+Usage: ./orbiter <command> [arguments]
+
+  install                 build and install the wallpaper, lock screen and bar
+  theme [variant]         apply the theme: black (default), dark or pearl;
+                          --revert goes back to Breeze Dark
+  lockscreen              use the Orbiter lock screen (log out and back in)
+  taskbar [keep|remove]   other panels: keep them with an Orbiter background
+                          (install does this), or remove them
+  uninstall               remove what install set up
+
+  As root (sudo ./orbiter ...):
+  login                   install the SDDM login screen
+  boot [--check]          install the boot menu (Limine or GRUB) and animation;
+                          --check only reports, including Secure Boot findings
+  preview-boot [mode]     play the boot animation in a window; mode is boot
+                          or shutdown (sudo --preserve-env=DISPLAY,XAUTHORITY)
+  uninstall-boot          remove the boot theme
+
+Colours, fonts and sizes live in tokens.toml; per-machine changes in
+~/.config/orbiter/tokens.toml. After editing, run install and theme again.
+EOF
+}
+
+command="$1"
+[ $# -gt 0 ] && shift
+case "$command" in
+    install)        exec "$here/scripts/install.sh" "$@" ;;
+    theme)          exec "$here/scripts/apply-theme.sh" "$@" ;;
+    lockscreen)     exec "$here/scripts/enable-lockscreen.sh" "$@" ;;
+    taskbar)        exec "$here/scripts/taskbar.sh" "$@" ;;
+    uninstall)      exec "$here/scripts/uninstall.sh" "$@" ;;
+    login)          exec "$here/scripts/install-sddm.sh" "$@" ;;
+    boot)           exec "$here/scripts/install-boot.sh" "$@" ;;
+    preview-boot)   exec "$here/scripts/preview-boot.sh" "$@" ;;
+    uninstall-boot) exec "$here/scripts/uninstall-boot.sh" "$@" ;;
+    ""|-h|--help|help) usage ;;
+    *) echo "Unknown command '$command'." >&2; usage >&2; exit 1 ;;
+esac

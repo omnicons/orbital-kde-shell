@@ -1,0 +1,29 @@
+#!/bin/sh
+# Builds and installs Orbiter for this user: the wallpaper, lock screen and
+# bar packages, then the theme (colours, Plasma style, fonts, Konsole, fish).
+# chezmoi reruns this whenever the line below changes: the chosen variant,
+# or any of the files the build uses.
+#
+# brand: {{ .brand }}, variant: {{ .variant }}, keep taskbar: {{ .keepTaskbar }}, lock screen: {{ .lockScreen }}
+# sources: {{ output "sh" "-c" (printf "cd %q && find tokens.toml src -type f ! -name '*.qsb' ! -path '*/__pycache__/*' | sort | xargs sha256sum | sha256sum" .chezmoi.workingTree) | trim }}
+set -e
+cd {{ .chezmoi.workingTree | quote }}
+
+./orbiter install
+./orbiter theme {{ .variant }}
+{{- if not .keepTaskbar }}
+./orbiter taskbar remove
+{{- end }}
+
+{{ if .lockScreen -}}
+./orbiter lockscreen
+{{- else -}}
+rm -f "$HOME/.config/systemd/user/plasma-kwin_wayland.service.d/orbiter-lockscreen.conf"
+systemctl --user daemon-reload
+{{- end }}
+
+# Plasma caches widget and wallpaper code; restart it to pick up new builds.
+if systemctl --user -q is-active plasma-plasmashell.service; then
+    systemctl --user restart plasma-plasmashell.service
+fi
+echo "Orbiter installed. The lock screen change applies after logging out and back in."

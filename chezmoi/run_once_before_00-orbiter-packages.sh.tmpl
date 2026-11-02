@@ -1,0 +1,48 @@
+#!/bin/sh
+# Installs what Orbiter builds with and runs on, once per machine. Supports
+# CachyOS or Arch (pacman) and Fedora 44 or later (dnf) with Plasma 6; the
+# package manager asks before installing anything.
+set -e
+
+. /etc/os-release
+case " $ID $ID_LIKE " in
+*" arch "*|*" cachyos "*)
+    packages="
+        python-pillow qt6-shadertools qt6-tools qt6-declarative
+        kpackage kconfig kitemmodels plasma-workspace ksystemstats libksysguard
+        milou plasma-nm plasma-pa bluez-qt power-profiles-daemon pacman-contrib
+        plymouth fontconfig ttf-ibm-plex konsole fish
+{{- if .loginScreen }}
+        sddm
+{{- end }}
+"
+    # shellcheck disable=SC2086
+    sudo pacman -S --needed $packages
+    ;;
+*" fedora "*)
+    # Fedora's KDE edition already has most of Plasma; power profiles come
+    # from its tuned-ppd. Plymouth's script plugin and theme switcher, and
+    # GRUB's font tool, are packaged separately there.
+    packages="
+        python3-pillow qt6-qtshadertools qt6-qtdeclarative
+        kf6-kpackage plasma-workspace ksystemstats libksysguard
+        plasma-milou plasma-nm plasma-pa kf6-bluez-qt
+        plymouth plymouth-scripts plymouth-plugin-script
+        fontconfig ibm-plex-sans-fonts ibm-plex-mono-fonts konsole fish
+{{- if .loginScreen }}
+        sddm
+{{- end }}
+{{- if .bootTheme }}
+        grub2-tools-extra
+{{- end }}
+"
+    # shellcheck disable=SC2086
+    sudo dnf install $packages
+    ;;
+*)
+    echo "Orbiter's package list covers Arch/CachyOS and Fedora; on $PRETTY_NAME, install" >&2
+    echo "the equivalents yourself: Pillow, Qt 6 shader tools (qsb), Plasma 6 with" >&2
+    echo "plasma-nm, plasma-pa, BluezQt, milou and libksysguard, Plymouth with its script" >&2
+    echo "plugin, IBM Plex Sans and Mono, Konsole and fish." >&2
+    ;;
+esac

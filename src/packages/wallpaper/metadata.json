@@ -1,0 +1,11 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Description": "The Earth, the Moon and the real night sky, drawn in ASCII",
+        "Icon": "preferences-desktop-wallpaper",
+        "Id": "org.orbiter.wallpaper",
+        "License": "MIT",
+        "Name": "Orbiter"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

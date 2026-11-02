@@ -1,0 +1,10 @@
+{
+    "KPackageStructure": "Plasma/Shell",
+    "KPlugin": {
+        "Description": "Orbiter's ASCII lock screen. Only kscreenlocker uses it; the desktop keeps its own shell.",
+        "Id": "org.orbiter.lockscreen",
+        "License": "MIT",
+        "Name": "Orbiter Lock Screen"
+    },
+    "X-Plasma-APIVersion": "2"
+}
