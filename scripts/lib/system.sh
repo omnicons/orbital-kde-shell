@@ -14,6 +14,18 @@ grub_tools() {
     fi
 }
 
+# Regenerates grub.cfg. By default Fedora's grub2-mkconfig also rewrites the
+# options line of every boot entry from /etc/default/grub, which drops any
+# kernel argument that's only in the entries (rhgb among them, and with it
+# Plymouth). --no-grubenv-update stops that; other GRUBs don't have the option.
+regenerate_grub_cfg() {
+    if "$GRUB_MKCONFIG" --help 2>/dev/null | grep -q -e --no-grubenv-update; then
+        "$GRUB_MKCONFIG" --no-grubenv-update -o "$GRUB_DIR/grub.cfg"
+    else
+        "$GRUB_MKCONFIG" -o "$GRUB_DIR/grub.cfg"
+    fi
+}
+
 # Finds limine.conf in the places Limine looks, on CachyOS's configured ESP
 # or the usual mount points. Sets LIMINE_CONF, and LIMINE_ESP to the mount
 # point of its partition (what limine.conf calls boot():/).
@@ -39,11 +51,16 @@ limine_hashes_go_stale() {
     grep -Eqs '^[[:space:]]*(module_path|kernel_path|image_path):.*#[0-9a-fA-F]{128}' "$LIMINE_CONF"
 }
 
-# Plymouth with its script plugin (a separate package on Fedora) and its
-# theme switcher (plymouth-scripts on Fedora).
+# Plymouth with its script plugin, its label plugin and its theme switcher
+# (all separate packages on Fedora). Our theme draws no text, but without the
+# label plugin the script plugin has no console viewer and segfaults on its
+# first frame, and label-freetype is the one that reaches the initramfs.
 plymouth_ready() {
     command -v plymouth-set-default-theme >/dev/null || return 1
-    [ -f /usr/lib/plymouth/script.so ] || [ -f /usr/lib64/plymouth/script.so ]
+    for dir in /usr/lib/plymouth /usr/lib64/plymouth; do
+        [ -f "$dir/script.so" ] && [ -f "$dir/label-freetype.so" ] && return 0
+    done
+    return 1
 }
 
 # The distribution's own theme, for when the previous one wasn't recorded.

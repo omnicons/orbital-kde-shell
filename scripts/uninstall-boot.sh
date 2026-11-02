@@ -36,7 +36,7 @@ limine)
 grub)
     python3 src/boot/grub_default.py remove /etc/default/grub
     rm -rf "$GRUB_DIR/themes/orbiter"
-    "$GRUB_MKCONFIG" -o "$GRUB_DIR/grub.cfg"
+    regenerate_grub_cfg
     ;;
 esac
 

@@ -41,7 +41,9 @@ def rgb(hex_colour):
 
 
 def pct(fraction):
-    return f"{fraction * 100:.1f}%"
+    # Whole numbers only: GRUB's parser stops at a decimal point and refuses
+    # the whole theme ("unrecognized number").
+    return f"{round(fraction * 100)}%"
 
 
 def selection_images(v, height):

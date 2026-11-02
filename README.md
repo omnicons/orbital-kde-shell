@@ -91,19 +91,21 @@ screens, also run `sudo ./orbiter boot`.
   hash (`path#hash`), it stops, since nothing would update the hashes.
 - **GRUB:** installs the theme to `themes/orbiter` in `/boot/grub` (Arch) or
   `/boot/grub2` (Fedora), points `/etc/default/grub` at it (backed up to
-  `grub.orbiter-backup`) and regenerates `grub.cfg`. On Fedora this needs
+  `grub.orbiter-backup`) and regenerates `grub.cfg`, leaving the kernel options
+  in your boot entries alone. On Fedora this needs
   `grub2-tools-extra` for `grub2-mkfont`. Fedora also hides the GRUB menu
   unless a boot fails: hold Shift at boot to see it, or show it every time
   with `sudo grub2-editenv - unset menu_auto_hide`.
 - **Anything else** (systemd-boot can't be themed): installs only the
   Plymouth animation.
 
-The animation needs Plymouth's script plugin, Plymouth in the initramfs,
-and `splash` (or Fedora's `rhgb`) on the kernel command line. CachyOS and
-Fedora set up the last two by default. On Fedora the plugin is a separate
-package, `plymouth-plugin-script`, which the chezmoi setup installs. The
-script checks the plugin before changing anything, and tells you if either of
-the other two is missing.
+The animation needs Plymouth's script and label plugins, Plymouth in the
+initramfs, and `splash` (or Fedora's `rhgb`) on the kernel command line. CachyOS
+and Fedora set up the last two by default. On Fedora the plugins are separate
+packages, `plymouth-plugin-script` and `plymouth-plugin-label`, which the chezmoi
+setup installs. Without the label plugin, Plymouth crashes when it starts the
+theme. The script checks the plugins before changing anything, and tells you if
+either of the other two is missing.
 
 ### Secure Boot
 

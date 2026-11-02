@@ -63,8 +63,8 @@ fi
 
 missing=""
 plymouth_ready || missing="${missing}
-  - Plymouth with its script plugin: plymouth (Arch), or plymouth-scripts
-    and plymouth-plugin-script (Fedora)"
+  - Plymouth with its script and label plugins: plymouth (Arch), or
+    plymouth-scripts, plymouth-plugin-script and plymouth-plugin-label (Fedora)"
 if [ "$BOOTLOADER" = grub ] && ! command -v "$GRUB_MKFONT" >/dev/null; then
     missing="${missing}
   - $GRUB_MKFONT, for the menu's fonts: grub2-tools-extra (Fedora)"
@@ -115,7 +115,7 @@ grub)
     done < build/boot/grub/fonts.list
     [ -f /etc/default/grub.orbiter-backup ] || cp -p /etc/default/grub /etc/default/grub.orbiter-backup
     python3 src/boot/grub_default.py apply /etc/default/grub "$THEME/theme.txt"
-    "$GRUB_MKCONFIG" -o "$GRUB_DIR/grub.cfg"
+    regenerate_grub_cfg
     echo "GRUB themed (backup: /etc/default/grub.orbiter-backup)."
     # Fedora hides the menu unless the last boot failed.
     if command -v grub2-editenv >/dev/null && grub2-editenv list 2>/dev/null | grep -q '^menu_auto_hide=1'; then
@@ -154,6 +154,15 @@ if ! grep -qs 'plymouth' /etc/mkinitcpio.conf /etc/mkinitcpio.conf.d/*.conf 2>/d
 fi
 if ! grep -qwE 'splash|rhgb' /proc/cmdline; then
     echo "Note: neither 'splash' nor 'rhgb' is on the kernel command line, so the boot animation won't show." >&2
+fi
+# Having the label plugin installed isn't enough; Plymouth crashes unless it's
+# in the initramfs too (see plymouth_ready).
+if command -v lsinitrd >/dev/null; then
+    initrd_files="$(lsinitrd 2>/dev/null || true)"
+    if [ -n "$initrd_files" ] && ! echo "$initrd_files" | grep -q 'label-freetype\.so'; then
+        echo "Warning: Plymouth's label plugin isn't in this kernel's initramfs, so the boot animation will crash." >&2
+        echo "Check that /usr/libexec/plymouth/plymouth-populate-initrd runs cleanly, then: sudo dracut --regenerate-all --force" >&2
+    fi
 fi
 secure_boot_verify || exit 1
 echo "Done. The new boot menu and animation show at the next boot."
