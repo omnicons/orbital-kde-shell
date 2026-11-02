@@ -33,6 +33,7 @@ FRAME = (0.22, 0.28, 0.78, 0.72)
 BRANDING_TOP = 0.30
 MENU = (0.24, 0.355, 0.52, 0.28)        # left, top, width, height
 TIMEOUT_TOP = 0.655
+BAR_HEIGHT = 28          # GRUB won't draw a progress bar any shorter
 
 
 def rgb(hex_colour):
@@ -109,13 +110,13 @@ terminal-font: "{mono(small_px)}"
     scrollbar = false
 }}
 
-# The auto-boot countdown: a thin accent bar and the seconds left.
+# The auto-boot countdown: an accent bar and the seconds left.
 + progress_bar {{
     id = "__timeout__"
     left = {pct(left)}
     width = {pct(width)}
     top = {pct(TIMEOUT_TOP)}
-    height = {round(10 * s)}
+    height = {BAR_HEIGHT}
     show_text = false
     fg_color = "{v['accent']}"
     bg_color = "{v['ansi'][0]}"
@@ -125,7 +126,7 @@ terminal-font: "{mono(small_px)}"
     id = "__timeout__"
     left = {pct(left)}
     width = {pct(width)}
-    top = {pct(TIMEOUT_TOP + 0.012)}
+    top = {pct(TIMEOUT_TOP)}+{BAR_HEIGHT + 8}
     height = {round(40 * s)}
     text = "AUTO-BOOT IN %d S"
     font = "{display(small_px)}"

@@ -17,9 +17,13 @@ captianjonez's "KDE Plasma Orbiter"; see [NOTICE.md](NOTICE.md) for credits.
 |---|---|
 | ![Lock screen with a dot-matrix clock](docs/images/lock-screen.png) | ![SDDM login screen](docs/images/login-screen.png) |
 
-| Boot menu (Limine) | Boot animation (preview) |
+| Boot menu (Limine) | Boot menu (GRUB) |
 |---|---|
-| ![Limine boot menu inside the Orbiter frame](docs/images/boot-menu.png) | ![Boot animation: dot-matrix wordmark and a typed-out boot log](docs/images/boot-animation.gif) |
+| ![Limine boot menu inside the Orbiter frame](docs/images/boot-menu.png) | ![GRUB boot menu inside the Orbiter frame, with a countdown bar](docs/images/grub-menu.png) |
+
+Boot animation (preview):
+
+![Boot animation: dot-matrix wordmark and a typed-out boot log](docs/images/boot-animation.gif)
 
 Up close, the planet is all characters:
 
@@ -188,7 +192,7 @@ another setup, check that:
    its `theme.txt`. With Secure Boot on, GRUB may also refuse custom fonts by
    design, so say whether it was on.
 3. The highlighted entry is a bright bar with an orange left edge.
-4. A thin orange countdown bar runs below the menu, with `AUTO-BOOT IN N S`
+4. An orange countdown bar runs below the menu, with `AUTO-BOOT IN N S`
    under it.
 
 A photo of the screen helps most. `sudo ./orbiter uninstall-boot` restores
