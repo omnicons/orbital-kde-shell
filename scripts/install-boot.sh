@@ -8,7 +8,7 @@
 #     only its global section changes (see src/boot/limine_conf.py). On
 #     CachyOS the initramfs is rebuilt with limine-mkinitcpio, which also
 #     refreshes the hashes limine.conf keeps and re-enrolls the config.
-#   GRUB (untested so far): the theme goes to themes/orbiter in /boot/grub
+#   GRUB (booted on Fedora, not yet with Secure Boot): the theme goes to themes/orbiter in /boot/grub
 #     (Arch) or /boot/grub2 (Fedora), its fonts are made with grub-mkfont,
 #     /etc/default/grub is backed up once and pointed at it (see
 #     src/boot/grub_default.py), and grub.cfg is regenerated.

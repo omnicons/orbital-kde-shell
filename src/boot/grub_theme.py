@@ -9,7 +9,7 @@ for the highlighted entry, plus fonts.list. GRUB needs its own font format
 (.pf2), made with grub-mkfont, which only GRUB machines have; install-boot.sh
 makes them from fonts.list ("<file name> <role> <pixel size>" per line).
 
-Untested on a real GRUB boot so far.
+Booted on Fedora so far, not yet with Secure Boot.
 """
 import argparse
 import socket

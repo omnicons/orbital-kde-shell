@@ -11,6 +11,24 @@ Made for CachyOS (or Arch) and Fedora 44 or later, with Plasma 6 on
 Wayland. Inspired by
 captianjonez's "KDE Plasma Orbiter"; see [NOTICE.md](NOTICE.md) for credits.
 
+![The Orbiter desktop: an ASCII-art Earth and Moon under the top bar](docs/images/desktop.png)
+
+| Lock screen | Login screen |
+|---|---|
+| ![Lock screen with a dot-matrix clock](docs/images/lock-screen.png) | ![SDDM login screen](docs/images/login-screen.png) |
+
+| Boot menu (Limine) | Boot animation (preview) |
+|---|---|
+| ![Limine boot menu inside the Orbiter frame](docs/images/boot-menu.png) | ![Boot animation: dot-matrix wordmark and a typed-out boot log](docs/images/boot-animation.gif) |
+
+Up close, the planet is all characters:
+
+![Close-up of the ASCII Earth](docs/images/earth-detail.png)
+
+The top bar in Black, Dark and Pearl:
+
+![The top bar in each variant](docs/images/bar-variants.png)
+
 MIT licensed ([LICENSE](LICENSE)). The bundled fonts and textures keep their
 own terms, listed in [NOTICE.md](NOTICE.md).
 
@@ -158,7 +176,8 @@ needs Plymouth's X11 renderer, which Fedora doesn't ship; there,
 
 ### Testing the GRUB theme
 
-The GRUB theme hasn't been booted yet. If you try it, check that:
+The GRUB theme has been booted on Fedora, without Secure Boot. If you try it on
+another setup, check that:
 
 1. The menu sits inside the orange-cornered frame on the wallpaper, with
    `ORBITER // BOOT SELECT` (or your brand) above it.
