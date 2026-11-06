@@ -91,6 +91,9 @@ lists.
 - **Quick settings:** click the status pill at the top right. From there you
   can pick a Wi-Fi network, Bluetooth device or audio output, and right-click
   a background app for its menu.
+- **Shell:** Orbiter never changes your login shell, and Konsole opens whichever
+  one you use. Konsole's colours apply to any shell, and fish also gets matching
+  syntax colours if it's installed.
 - **fastfetch:** the theme installs a fastfetch config with the wallpaper's
   Earth as its logo, so CachyOS's fish greeting matches too. Any config you
   already had is kept as `~/.config/fastfetch/config.jsonc.orbiter-backup`,

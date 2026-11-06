@@ -20,8 +20,10 @@ if [ "$1" = "--revert" ]; then
     done
     kwriteconfig6 --file kwinrc --group WM --key activeFont --delete
     kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile --delete
-    echo y | fish -c 'fish_config theme save "fish default"' >/dev/null
-    fish -c 'set -eU pure_color_success'
+    if command -v fish >/dev/null; then
+        echo y | fish -c 'fish_config theme save "fish default"' >/dev/null
+        fish -c 'set -eU pure_color_success'
+    fi
     if [ -f "$FASTFETCH/config.jsonc.orbiter-backup" ]; then
         mv "$FASTFETCH/config.jsonc.orbiter-backup" "$FASTFETCH/config.jsonc"
     elif grep -qs "^// Orbiter's fastfetch" "$FASTFETCH/config.jsonc"; then
@@ -58,7 +60,10 @@ rm -rf "$CACHE/plasma_theme_orbiter.kcache" "$CACHE/ksvg-elements"
 # the bar's Design row uses (it also sets Konsole's default profile).
 cp build/theme/konsole/* "$DATA/konsole/"
 cp src/theme/switch-variant.sh "$DATA/orbiter/"
-fish src/theme/orbiter.fish
+# Optional: bash and zsh get their colours from Konsole's palette.
+if command -v fish >/dev/null; then
+    fish src/theme/orbiter.fish
+fi
 # fastfetch, which CachyOS's fish greeting runs. Someone else's config is
 # kept once as config.jsonc.orbiter-backup; --revert puts it back.
 mkdir -p "$FASTFETCH"
